@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAINEL ADMINISTRATIVO - FRUTO PROIBIDO</title>
+    <link rel="stylesheet" href="style2.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    
+<header class="main-header">
+        <div class="header-content">
+            <img src="imagens/logo.png" alt="Logo" class="header-logo">
+            
+        </div>
+    
+    
+    <nav class="tabs-menu">
+        <button class="tab-btn active" onclick="abrirAba(event, 'aba-produtos')">
+            <i class="fas fa-boxes"></i> <span>Produtos</span>
+        </button>
+        <button class="tab-btn" onclick="abrirAba(event, 'aba-solicitacoes')">
+            <i class="fas fa-bell"></i> <span>Solicitações</span>
+            <span id="badge-notificacao" class="badge">!</span>
+        </button>
+        <button class="tab-btn" onclick="abrirAba(event, 'aba-agendamentos')">
+            <i class="fas fa-calendar-check"></i> <span>Agenda</span>
+        </button>        
+        <button class="tab-btn" onclick="abrirAba(event, 'aba-historico')">
+            <i class="fas fa-history"></i> <span>Histórico</span>
+        </button>
+        <button class="tab-btn" onclick="abrirAba(event, 'aba-financeiro')">
+            <i class="fas fa-chart-line"></i> <span>Financeiro</span>
+        </button>
+    </nav>
+</header>
+
+<main>
+    <div id="aba-produtos" class="tab-content active aba-produtos">
+        <div class="header-aba">
+            <h2>Meus Equipamentos</h2>
+            <button class="btn-novo" onclick="abrirModal()"><i class="fas fa-plus"></i> Novo Item</button>
+        </div>
+        <div id="grid-produtos" class="grid-layout"></div>
+    </div>
+
+    <div id="aba-solicitacoes" class="tab-content aba-solicitacoes">
+        <div class="header-aba">
+            <div>
+                <h2>Pendentes de Aprovação</h2>
+            </div>
+        </div>
+        <div id="lista-solicitacoes-pendentes" class="grid-layout"></div>
+    </div>
+
+    <div id="aba-agendamentos" class="tab-content aba-agenda">
+        <div class="header-aba">
+            <h2>Datas Ocupadas / Ativas</h2>
+        </div>
+        <div id="grid-reservas" class="grid-layout"></div>
+    </div>
+
+    <div id="aba-historico" class="tab-content">
+        <div class="header-aba">
+            <h2>Histórico de Locações</h2>
+        </div>
+        <div id="grid-historico" class="grid-layout"></div>
+    </div> 
+
+    <div id="aba-financeiro" class="tab-content">
+        <div class="header-aba">
+            <div>
+                <h2><i class="fas fa-chart-line"></i> Painel Financeiro</h2>
+                <p style="font-size: 0.8em; color: #666;">Relatório de locações finalizadas e faturamento.</p>
+            </div>
+            <div class="filtros-financas">
+                <input type="month" id="filtro-mes-financeiro" onchange="carregarRelatorioFinanceiro()" class="input-moderno">
+                <button onclick="limparFiltroFinancas()" class="btn-secundario">Ver Tudo</button>
+            </div>
+        </div>
+
+        <div class="cards-financeiros">
+            <div class="card-fin faturamento">
+                <span>Faturamento no Período</span><br>
+                <strong id="faturamento-valor">R$ 0,00</strong>
+            </div>
+            <div class="card-fin concluidas">
+                <span>Locações Concluídas</span><br>
+                <strong id="total-concluidas">0</strong>
+            </div>
+        </div>
+
+        <div class="container-grafico">
+            <canvas id="graficoDesempenho"></canvas>
+        </div>
+
+        <div class="tabela-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Qtd. Locações</th>
+                        <th>Total Rendido</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-corpo-financas"></tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<div id="modal-cadastro" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="fecharModal()">&times;</span>
+        <h2><i class="fas fa-plus-circle"></i> Cadastrar Produto</h2>
+        <form id="form-cadastro">
+            <div class="campo-grupo">
+                <label>Nome do Item</label>
+                <input type="text" id="nome-brinquedo" placeholder="Ex: PULA PULA" required>
+            </div>
+            <div class="campo-grupo">
+                <label>Link da Foto (URL)</label>
+                <input type="url" id="imagem-brinquedo" placeholder="http://...">
+            </div>
+            <div class="campo-grupo">
+                <label>Descrição/Caracteristicas</label>
+                <textarea id="descricao-brinquedo" placeholder="Ex: 2,44 Metros"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <div class="campo-grupo" style="flex:1">
+                    <label>Valor R$</label>
+                    <input type="text" id="valor-brinquedo" placeholder="0,00">
+                </div>
+                <div class="campo-grupo" style="flex:1">
+                    <label>WhatsApp</label>
+                    <input type="tel" id="whatsapp-dono" placeholder="Apenas números">
+                </div>
+            </div>
+
+            <div class="campo-grupo">
+                <label for="prod-categoria">Categoria:</label>
+                <select id="prod-categoria" style="width: 100%;">
+                    <option value="Brinquedos">Brinquedos</option>
+                    <option value="Itens de Decoração">Itens de Decoração</option>
+                    <option value="Eletrônicos">Eletrônicos</option>
+                    <option value="Infláveis">Infláveis</option>
+                    <option value="Jogos">Jogos</option>
+                    <option value="Mesas e Cadeiras">Mesas e Cadeiras</option>   
+                </select>
+            </div>
+
+            <div class="campo-grupo">
+                <label for="prod-estoque">Quantidade em Estoque:</label>
+                <input type="number" id="prod-estoque" min="1" value="1">
+            </div>
+
+            <button type="submit" class="btn-acao-principal" style="width: 100%;">Salvar Produto</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="firebase-config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
