@@ -133,7 +133,7 @@ body {
 }
 
 .card-padrao.bloqueado { opacity: 0.6; filter: grayscale(0.5); border-top: 5px solid var(--history-gray) !important; }
-.card-solicitacao.confirmado { border-left: 6px solid var(--success-green); box-shadow: 0 10px 25px rgba(40, 167, 69, 0.15); }
+
 
 /* Variações de Borda Superior por Aba */
 #aba-produtos .card-padrao { border-top: 5px solid var(--primary-blue); }
