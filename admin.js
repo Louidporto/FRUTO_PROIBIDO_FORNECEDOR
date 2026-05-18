@@ -36,6 +36,7 @@ function abrirAba(evt, nomeAba) {
     if(nomeAba === 'aba-solicitacoes') carregarSolicitacoes();
     if(nomeAba === 'aba-agendamentos') carregarAgenda(); // <--- Adicione ou verifique esta linha
     if(nomeAba === 'aba-financeiro') carregarRelatorioFinanceiro();
+    if(nomeAba === 'aba-historico') carregarHistorico();
 }
 
 // Função Única para Abrir Modal (ajustada para limpar formulário)
@@ -228,8 +229,11 @@ function carregarRelatorioFinanceiro() {
         if (dados) {
             Object.keys(dados).forEach(id => {
                 const p = dados[id];
-                if (p.status === 'confirmado') {
+                
+                // AJUSTE AQUI: O financeiro agora aceita 'confirmado' e 'finalizado'
+                if (p.status === 'confirmado' || p.status === 'finalizado') {
                     totalGeral += p.valor_total;
+                    
                     corpoTabela.innerHTML += `
                         <tr>
                             <td>#${id.slice(-5).toUpperCase()}</td>
@@ -354,4 +358,23 @@ function gerarHtmlCardPedido(id, pedido, tipoAba) {
                 </div>
             </div>
         </div>`;
+}
+
+function carregarHistorico() {
+    const lista = document.getElementById('lista-historico'); // Certifique-se de ter esse ID no HTML
+    if (!lista) return;
+
+    database.ref('pedidos').on('value', (snapshot) => {
+        const pedidos = snapshot.val();
+        lista.innerHTML = "";
+        if (pedidos) {
+            Object.keys(pedidos).reverse().forEach(id => {
+                // Filtra apenas os pedidos finalizados
+                if (pedidos[id].status === 'finalizado') {
+                    lista.innerHTML += gerarHtmlCardPedido(id, pedidos[id], 'historico');
+                }
+            });
+        }
+        if (lista.innerHTML === "") lista.innerHTML = "<p class='aviso'>Nenhum pedido no histórico.</p>";
+    });
 }
