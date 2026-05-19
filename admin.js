@@ -181,24 +181,33 @@ function alterarStatusPedido(id, novoStatus) {
         });
 }
 
-// 3. Função auxiliar para montar e enviar a mensagem de WhatsApp
+// 3. Função auxiliar para montar e enviar a mensagem de WhatsApp (CORRIGIDA)
 function enviarMensagemConfirmacao(pedido, id) {
-    const numeroCliente = pedido.cliente_whatsapp.replace(/\D/g, ''); // Limpa o número
+    // Garante que o número não tenha caracteres estranhos. 
+    // Se o cliente já digitou com 55 no início, evitamos duplicar.
+    let numeroCliente = pedido.cliente_whatsapp.replace(/\D/g, ''); 
+    if (!numeroCliente.startsWith('55') && numeroCliente.length >= 10) {
+        numeroCliente = '55' + numeroCliente;
+    }
+    
     const idCurto = id.slice(-5).toUpperCase();
     
-    let mensagem = `*CONFIRMAÇÃO DE PEDIDO - FRUTO PROIBIDO*%0A%0A`;
-    mensagem += `Olá! Seu pedido *#${idCurto}* foi confirmado e já está em nossa agenda de preparo. 🛍️%0A%0A`;
-    mensagem += `*Detalhes do Pedido:*%0A`;
+    // Montamos o texto usando quebras de linha normais (\n) dentro das crases
+    let mensagemText = `*CONFIRMAÇÃO DE PEDIDO - FRUTO PROIBIDO*\n\n`;
+    mensagemText += `Olá! Seu pedido *#${idCurto}* foi confirmado e já está em nossa agenda de preparo. 🛍️\n\n`;
+    mensagemText += `*Detalhes do Pedido:*\n`;
     
     pedido.itens.forEach(item => {
-        mensagem += `- ${item.quantidade}x ${item.nome} (Tam: ${item.tamanho || 'U'})%0A`;
+        mensagemText += `- ${item.quantidade}x ${item.nome} (Tam: ${item.tamanho || 'U'})\n`;
     });
     
-    mensagem += `%0A*Total:* R$ ${pedido.valor_total.toFixed(2).replace('.', ',')}%0A%0A`;
-    mensagem += `Agradecemos a preferência! Se tiver alguma dúvida, estamos à disposição. ✨`;
+    mensagemText += `\n*Total:* R$ ${pedido.valor_total.toFixed(2).replace('.', ',')}\n\n`;
+    mensagemText += `Agradecemos a preferência! Se tiver alguma dúvida, estamos à disposição. ✨`;
 
-    // Abre o WhatsApp com a mensagem pronta
-    const linkWhatsapp = `https://wa.me/55${numeroCliente}?text=${mensagem}`;
+    // O encodeURIComponent transforma espaços, quebras de linha e emojis no formato correto de URL
+    const linkWhatsapp = `https://wa.me/${numeroCliente}?text=${encodeURIComponent(mensagemText)}`;
+    
+    // Abre a API do WhatsApp de forma limpa
     window.open(linkWhatsapp, '_blank');
 }
 
