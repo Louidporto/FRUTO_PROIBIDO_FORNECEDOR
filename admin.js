@@ -211,27 +211,16 @@ function enviarMensagemConfirmacao(pedido, id) {
     window.open(linkWhatsapp, '_blank');
 }
 
-function atualizarBadgeNotificacao() {
-    database.ref('pedidos').orderByChild('status').equalTo('pendente').on('value', snapshot => {
-        const count = snapshot.numChildren();
-        const badge = document.getElementById('badge-notificacao');
-        if (badge) {
-            badge.innerText = count;
-            badge.style.display = count > 0 ? 'block' : 'none';
-        }
-    });
-}
-
 // ================================================================
 // 5. FINANCEIRO E EXCLUSÃO
 // ================================================================
 function carregarRelatorioFinanceiro() {
-    const corpoTabela = document.getElementById('tabela-corpo-financas');
+    const cuerpoTabela = document.getElementById('tabela-corpo-financas');
     const faturamentoTxt = document.getElementById('faturamento-valor');
 
     database.ref('pedidos').on('value', snapshot => {
         const dados = snapshot.val();
-        corpoTabela.innerHTML = "";
+        cuerpoTabela.innerHTML = "";
         let totalGeral = 0;
         let resumoGrafico = {};
 
@@ -239,14 +228,16 @@ function carregarRelatorioFinanceiro() {
             Object.keys(dados).forEach(id => {
                 const p = dados[id];
                 
-                // AJUSTE AQUI: O financeiro agora aceita 'confirmado' e 'finalizado'
                 if (p.status === 'confirmado' || p.status === 'finalizado') {
                     totalGeral += p.valor_total;
                     
-                    corpoTabela.innerHTML += `
+                    // MODIFICADO: Trocado p.cliente_whatsapp por p.cliente_nome para exibir na tabela
+                    const nomeTabela = p.cliente_nome || 'Não Informado';
+                    
+                    cuerpoTabela.innerHTML += `
                         <tr>
                             <td>#${id.slice(-5).toUpperCase()}</td>
-                            <td>${p.cliente_whatsapp}</td>
+                            <td>${nomeTabela}</td>
                             <td>R$ ${p.valor_total.toFixed(2).replace('.',',')}</td>
                         </tr>`;
 
@@ -262,7 +253,6 @@ function carregarRelatorioFinanceiro() {
         atualizarGrafico(resumoGrafico);
     });
 }
-
 function atualizarGrafico(resumo) {
     const canvas = document.getElementById('graficoDesempenho');
     if (!canvas) return;
@@ -307,11 +297,12 @@ function carregarAgenda() {
     });
 }
 
-// Função mestre para criar o HTML dos cards (Padronizado)
+// Função mestre para criar o HTML dos cards (Padronizado - Atualizado com Nome do Cliente)
 function gerarHtmlCardPedido(id, pedido, tipoAba) {
     const data = new Date(pedido.data).toLocaleString('pt-BR');
     const idCurto = id.slice(-5).toUpperCase();
-    const whatsappLimpo = pedido.cliente_whatsapp.replace(/\D/g, '');
+    const whatsappLimpo = pedido.cliente_whatsapp ? pedido.cliente_whatsapp.replace(/\D/g, '') : '';
+    const nomeCliente = pedido.cliente_nome || 'Não Informado';
 
     // Gera a lista de itens com miniaturas (estilo carrinho)
     const itensHtml = pedido.itens ? pedido.itens.map(item => `
@@ -349,6 +340,10 @@ function gerarHtmlCardPedido(id, pedido, tipoAba) {
             <div class="solicitacao-header">
                 <span><strong>Pedido #${idCurto}</strong></span>
                 <span class="data-badge">${data}</span>
+            </div>
+            
+            <div class="cliente-info-card" style="padding: 10px 15px 5px 15px; font-size: 1rem; color: #7b001c;">
+                <i class="fas fa-user"></i> Cliente: <strong>${nomeCliente}</strong>
             </div>
             
             <div class="lista-itens-solicitacao">
