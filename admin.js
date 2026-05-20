@@ -43,11 +43,13 @@ function abrirAba(evt, nomeAba) {
 function abrirModal() {
     const modal = document.getElementById('modal-cadastro');
     const form = document.getElementById('form-cadastro');
+
+
     
     form.reset(); 
     if(document.getElementById('prod-id')) document.getElementById('prod-id').value = ""; 
     document.getElementById('modal-titulo').innerHTML = '<i class="fas fa-plus-circle"></i> Cadastrar Novo Produto';
-    
+    document.getElementById('prod-tamanhos').value = ""; document.getElementById('prod-cores').value = "";
     modal.style.display = 'flex';
 }
 
@@ -114,18 +116,22 @@ document.getElementById('form-cadastro').addEventListener('submit', function(e) 
     const idProduto = document.getElementById('prod-id') ? document.getElementById('prod-id').value : "";
 
     // Tratamento de Preço
-    let valorRaw = document.getElementById('valor-brinquedo').value;
+    let valorRaw = document.getElementById('valor').value;
     let valorLimpo = valorRaw.replace('R$', '').trim().replace('.', '').replace(',', '.');
     const valorNumerico = parseFloat(valorLimpo) || 0;
 
+    // Atualize o objeto dadosProduto dentro do seu eventListener de submit:
     const dadosProduto = {
-        nome: document.getElementById('nome-brinquedo').value,
-        imagem: document.getElementById('imagem-brinquedo').value || "imagens/placeholder.png",
-        descricao: document.getElementById('descricao-brinquedo').value,
-        valor: valorNumerico, // Use "valor" para bater com o carregarProdutos
+        nome: document.getElementById('nome').value,
+        imagem: document.getElementById('imagem').value || "imagens/placeholder.png",
+        descricao: document.getElementById('descricao').value,
+        valor: valorNumerico, 
         whatsapp: document.getElementById('whatsapp-dono').value,
-        categoria: document.getElementById('prod-categoria').value.toLowerCase(),
-        estoque_total: parseInt(document.getElementById('prod-estoque').value) || 0, // Use estoque_total
+        categoria: document.getElementById('prod-categoria').value.trim(),
+        estoque_total: parseInt(document.getElementById('prod-estoque').value) || 0, 
+        // ADICIONA ESTAS DUAS LINHAS QUE FALTAVAM PARA GRAVAR NO BANCO:
+        tamanhos: document.getElementById('prod-tamanhos') ? document.getElementById('prod-tamanhos').value.trim() : "",
+        cores: document.getElementById('prod-cores') ? document.getElementById('prod-cores').value.trim() : "",
         status: "ativo",
         timestamp: Date.now()
     };
@@ -198,7 +204,7 @@ function enviarMensagemConfirmacao(pedido, id) {
     mensagemText += `*Detalhes do Pedido:*\n`;
     
     pedido.itens.forEach(item => {
-        mensagemText += `- ${item.quantidade}x ${item.nome} (Tam: ${item.tamanho || 'U'})\n`;
+        mensagemText += `- ${item.quantidade}x ${item.nome} (Tam: ${item.tamanho || 'U'}) ${item.cor}\n`;
     });
     
     mensagemText += `\n*Total:* R$ ${pedido.valor_total.toFixed(2).replace('.', ',')}\n\n`;
@@ -310,7 +316,7 @@ function gerarHtmlCardPedido(id, pedido, tipoAba) {
             <img src="${item.imagem || 'imagens/placeholder.png'}" class="img-mini-solicitacao">
             <div class="info-mini">
                 <span class="nome-prod">${item.quantidade}x ${item.nome}</span>
-                <span class="detalhe-prod">Tam: ${item.tamanho || 'U'} | R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
+                <span class="detalhe-prod">Tam: ${item.tamanho || 'U'} | ${item.cor} | R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
             </div>
         </div>
     `).join('') : '<p>Sem itens cadastrados</p>';
