@@ -115,23 +115,23 @@
         <form id="form-cadastro">
             <input type="hidden" id="prod-id"> <div class="campo-grupo">
                 <label>Nome do Item</label>
-                <input type="text" id="nome-brinquedo" placeholder="Ex: Conjunto Renda" required>
+                <input type="text" id="nome" placeholder="Ex: Conjunto Renda" required>
             </div>
             
             <div class="campo-grupo">
                 <label>Link da Foto (URL)</label>
-                <input type="url" id="imagem-brinquedo" placeholder="https://...">
+                <input type="url" id="imagem" placeholder="https://...">
             </div>
             
             <div class="campo-grupo">
                 <label>Descrição/Características</label>
-                <textarea id="descricao-brinquedo" placeholder="Detalhes do tamanho, material, etc."></textarea>
+                <textarea id="descricao" placeholder="Detalhes do tamanho, material, etc."></textarea>
             </div>
             
             <div style="display: flex; gap: 10px;">
                 <div class="campo-grupo" style="flex:1">
                     <label>Valor R$</label>
-                    <input type="text" id="valor-brinquedo" placeholder="0,00">
+                    <input type="text" id="valor" placeholder="0,00">
                 </div>
                 <div class="campo-grupo" style="flex:1">
                     <label>WhatsApp (Opcional)</label>
@@ -149,6 +149,16 @@
                     <option value="Infantil">Infantil</option>                
                     <option value="Acessórios">Acessórios</option>
                 </select>
+            </div>
+
+            <div class="campo-grupo">
+                <label>Tamanhos Disponíveis (Separe por vírgula)</label>
+                <input type="text" id="prod-tamanhos" placeholder="Ex: P, M, G, GG ou U">
+            </div>
+
+            <div class="campo-grupo">
+                <label>Cores Disponíveis (Separe por vírgula ou use Hexadecimal)</label>
+                <input type="text" id="prod-cores" placeholder="Ex: Preto, Branco, Vermelho ou #ff0000">
             </div>
 
             <div class="campo-grupo">
